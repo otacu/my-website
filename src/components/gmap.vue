@@ -1,6 +1,7 @@
 <template>
     <div>
         <googlemaps-map
+                ref="map"
                 :center.sync="center"
                 :zoom.sync="zoom"
                 :options="mapOptions"
@@ -23,6 +24,7 @@
                      }"
                     :position="marker.position"
                     @click="selectMarker(marker)"
+                    :ref="'marker'+marker._id"
             />
 
         </googlemaps-map>
@@ -46,9 +48,10 @@
 //                currentMarker: {_id: 1, position: {lng: 139.7562635, lat: 35.7359733}, title: "田端"}
                 center: {lng: 139.0855869, lat: 35.9916443},
                 zoom: 10,
-                mapOptions: {},
+                mapOptions: null,
                 markers: [],
-                currentMarker: {}
+                currentMarker: null,
+                markerInfoWindow:null
             }
         },
         methods: {
@@ -61,7 +64,16 @@
 
             },
             selectMarker(marker){
-                this.currentMarker = marker
+                this.currentMarker = marker;
+                var map_ele = this.$refs.map.$_map;
+                let marker_ele=this.$refs['marker'+marker._id][0].$_marker;
+                if (this.markerInfoWindow!=null) {
+                    this.markerInfoWindow.close();
+                }
+                this.markerInfoWindow= new window.google.maps.InfoWindow({
+                    content:'<div>'+marker.title+'</div><div><img src=""/></div>'
+                });
+                this.markerInfoWindow.open(map_ele, marker_ele);
             }
         },
         watch: {
